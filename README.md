@@ -20,7 +20,10 @@ git clone https://github.com/ROCm/flash-attention.git
 cd flash-attention/
 GPU_ARCHS=gfx90a python setup.py install  # MI200 series
 ```
-Here, `gfx90a` is the correct GPU architecture choice for MI250X. In the last step, make sure to build with `ninja` (`pip install ninja`), otherwise it might take forever. The same page linked above also provides Triton kernels for FlashAttention-2, but I haven't tried them yet.
+Here, `gfx90a` is the correct GPU architecture choice for MI250X. In the last step, make sure to build with `ninja` (`pip install ninja`), otherwise it might take forever. Also, make sure to set your ROCm home directory correctly for the installation to proceed: *e.g.* `export ROCM_HOME=/opt/rocm-6.1.3` (or `export ROCM_HOME=/opt/rocm-6.2.0` if you have ROCm 6.2).
+
+
+The same page linked above also provides Triton kernels for FlashAttention-2, but I haven't tried them yet.
 
 #### Hugging Face ecosystem:
 You can then install the standard Hugging Face libraries in the usual way, *e.g.*:
