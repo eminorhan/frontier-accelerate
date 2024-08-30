@@ -25,6 +25,8 @@ import logging
 import math
 import os
 import random
+import warnings
+
 from itertools import chain
 
 import datasets
@@ -49,6 +51,9 @@ from transformers import (
 from transformers.utils.versions import require_version
 from datetime import timedelta
 from accelerate import InitProcessGroupKwargs
+
+# TODO: this is just a temporary solution to avoid some annoying torch.amp warnings that will be fixed in 2.4.1 hopefully
+warnings.filterwarnings("ignore")
 
 logger = get_logger(__name__)
 
@@ -86,7 +91,7 @@ def main():
     print(args)
 
     # context length (default: 8192)
-    block_size = args.block_size  # tokenizer.model_max_length
+    block_size = args.block_size  # hacky TODO: fix 
 
     # Initialize the accelerator
     process_group_kwargs = InitProcessGroupKwargs(timeout=timedelta(seconds=3600))  # 1 hour
@@ -115,7 +120,7 @@ def main():
     # In distributed training, 'load_dataset' function guarantees that only one local process can concurrently download the dataset.
     logger.info(f"Loading dataset.")
     with accelerator.main_process_first():
-        raw_datasets = load_dataset("Salesforce/wikitext", "wikitext-2-v1", trust_remote_code=True)  # TODO: pass dataset as argument rather than hardcoding
+        raw_datasets = load_dataset("Salesforce/wikitext", "wikitext-103-v1", trust_remote_code=True)  # TODO: pass dataset as argument rather than hardcoding
 
     # Load pretrained config, model and tokenizer
     # In distributed training, the .from_pretrained methods guarantee that only one local process can concurrently download model & vocab.
@@ -180,7 +185,7 @@ def main():
     train_dataset = lm_datasets["train"]
     val_dataset = lm_datasets["validation"]
     train_dataloader = DataLoader(train_dataset, shuffle=True, collate_fn=default_data_collator, batch_size=args.per_device_train_batch_size)
-    val_dataloader = DataLoader(val_dataset, shuffle=False, collate_fn=default_data_collator, batch_size=args.per_device_train_batch_size)
+    val_dataloader = DataLoader(val_dataset, shuffle=False, collate_fn=default_data_collator, batch_size=2*args.per_device_train_batch_size)  # 2 * tr batch size (not sure if this is OK; TODO: check)
 
     # Log a few random samples from the training set:
     for index in random.sample(range(len(train_dataset)), 3):

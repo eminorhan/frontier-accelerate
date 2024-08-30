@@ -10,12 +10,14 @@
 #SBATCH --array=0
 #SBATCH --qos=debug
 
+# set proxy server to enable communication with outside
 export all_proxy=socks://proxy.ccs.ornl.gov:3128/
 export ftp_proxy=ftp://proxy.ccs.ornl.gov:3128/
 export http_proxy=http://proxy.ccs.ornl.gov:3128/
 export https_proxy=http://proxy.ccs.ornl.gov:3128/
 export no_proxy='localhost,127.0.0.0/8,*.ccs.ornl.gov'
 
+# honestly, not sure how many of these below (if any) are absolutely necessary
 export NCCL_ASYNC_ERROR_HANDLING=1
 export NCCL_BLOCKING_WAIT=1
 export NCCL_IB_TIMEOUT=31
@@ -53,6 +55,7 @@ export LAUNCHER="accelerate launch \
 export SCRIPT="/lustre/orion/stf218/scratch/emin/frontier-guide/train.py"
 export SCRIPT_ARGS=" \
     --model_name_or_path "meta-llama/Meta-Llama-3.1-8B" \
+    --block_size 8192 \
     --per_device_train_batch_size 3 \
     --gradient_accumulation_steps 1 \
     --learning_rate 0.0001 \
