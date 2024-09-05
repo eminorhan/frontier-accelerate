@@ -195,6 +195,7 @@ def main():
     logger.info(f"Model = {model}")
     logger.info(f"Number of params (M): {sum(p.numel() for p in model.parameters() if p.requires_grad) / 1.e6}")
     model = accelerator.prepare(model)
+    logger.info(f"Model = {model}")
 
     # Optimizer: split weights in two groups, one with weight decay and the other not.
     no_decay = ["bias", "layer_norm.weight"]
@@ -202,7 +203,7 @@ def main():
         {"params": [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)], "weight_decay": args.weight_decay},
         {"params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)], "weight_decay": 0.0},
     ]
-    optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=args.learning_rate)
+    optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=args.learning_rate, fused=True)
 
     # Math around the number of training steps.
     overrode_max_train_steps = False
@@ -297,9 +298,10 @@ def main():
             with accelerator.accumulate(model):
                 outputs = model(**batch)
                 loss = outputs.loss
-                # print(loss.get_device())  # check to see what device this is on
-                # keep track of the train loss
+                # print(loss.get_device())  # check the device this is on
                 train_loss += loss.detach().float()
+                # need to free to before bwd to avoid peaking memory
+                del outputs
                 accelerator.backward(loss)
                 optimizer.step()
                 lr_scheduler.step()

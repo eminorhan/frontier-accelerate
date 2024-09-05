@@ -18,6 +18,7 @@ export https_proxy=http://proxy.ccs.ornl.gov:3128/
 export no_proxy='localhost,127.0.0.0/8,*.ccs.ornl.gov'
 
 # honestly, not sure how many of these below (if any) are absolutely necessary
+# export LD_LIBRARY_PATH=/lustre/orion/stf218/scratch/emin/aws-ofi-rccl/lib:$LD_LIBRARY_PATH
 export NCCL_ASYNC_ERROR_HANDLING=1
 export NCCL_BLOCKING_WAIT=1
 export NCCL_IB_TIMEOUT=31
@@ -56,14 +57,13 @@ export SCRIPT="/lustre/orion/stf218/scratch/emin/frontier-guide/train.py"
 export SCRIPT_ARGS=" \
     --model_name_or_path "meta-llama/Meta-Llama-3.1-8B" \
     --block_size 8192 \
-    --per_device_train_batch_size 3 \
+    --per_device_train_batch_size 4 \
     --gradient_accumulation_steps 1 \
     --learning_rate 0.0001 \
     --output_dir "${MODEL_ROOT_DIR}/${SP}" \
     --num_train_epochs 20 \
     --checkpointing_steps 100 \
     "
-    
 # this step is necessary because accelerate launch does not seem to handle multiline arguments properly
 export CMD="$LAUNCHER $SCRIPT $SCRIPT_ARGS" 
 srun $CMD
