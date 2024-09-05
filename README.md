@@ -32,7 +32,7 @@ pip install transformers datasets accelerate
 ```
 
 #### `aws-ofi-rccl` plugin:
-I observe ~20% improvement in runtime when I use the `aws-ofi-rccl` plugin, which enables `rccl` to use `libfabric`. I provide a shell script here ([`aws_ofi_rccl.sh`](https://github.com/eminorhan/frontier-guide/blob/master/aws_ofi_rccl.sh)) to install this plugin. Simply run this script (*e.g.* `sh aws_ofi_rccl.sh`) to install the plugin. I should note, however, that I found this plugin to be quite unstable: it often causes jobs to fail randomly for mysterious reasons. 
+I've observed a ~20% improvement in runtime when I use the `aws-ofi-rccl` plugin, which enables `rccl` to use `libfabric`. I provide a shell script here ([`aws_ofi_rccl.sh`](https://github.com/eminorhan/frontier-guide/blob/master/aws_ofi_rccl.sh)) to install this plugin. Simply run this script (*e.g.* `sh aws_ofi_rccl.sh`) to install the plugin (the script assumes that your ROCm version is 6.1.3; if you're using a different version, change it accordingly). I should note, however, that I found this plugin to be quite unstable: it often causes jobs to fail randomly for mysterious reasons.
 
 ### Results
 **Update (Sep 5):** A further ~20% improvement in runtime with the `aws-ofi-rccl` plugin (see above). Time per update is now ~77 seconds, and total time estimated to train for 1T tokens on 64 Frontier nodes is now down to **~53 days**. Marchons!
