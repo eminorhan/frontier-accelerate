@@ -31,7 +31,12 @@ You can then install the standard Hugging Face libraries in the usual way, *e.g.
 pip install transformers datasets accelerate
 ```
 
+#### `aws-ofi-rccl` plugin:
+I observe ~20% improvement in runtime when I use the `aws-ofi-rccl` plugin, which enables `rccl` to use `libfabric`. I provide a shell script here ([`aws_ofi_rccl.sh`](https://github.com/eminorhan/frontier-guide/blob/master/aws_ofi_rccl.sh)) to install this plugin. Simply run this script (*e.g.* `sh aws_ofi_rccl.sh`) to install the plugin. I should note, however, that I found this plugin to be quite unstable: it often causes jobs to fail randomly for mysterious reasons. 
+
 ### Results
+**Update (Sep 5):** A further ~20% improvement in runtime with the `aws-ofi-rccl` plugin (see above). Time per update is now ~77 seconds, and total time estimated to train for 1T tokens on 64 Frontier nodes is now down to **~53 days**. Marchons!
+
 **Update (Sep 5):** Slightly improved throughput by freeing some memory before the backward pass (inspired by the [torchtitan](https://github.com/pytorch/torchtitan) repo). Batch size is now 4 per device, tokens per update is 16.8M, time per update is ~95 seconds, and total time estimated to train for 1T tokens on 64 Frontier nodes is now **~65 days**.
 
 The training files in this repo ([`train.py`](https://github.com/eminorhan/frontier-guide/blob/master/train.py) and [`train.sh`](https://github.com/eminorhan/frontier-guide/blob/master/train.sh)) are my first attempt to train a Llama-3.1 8B model with a context length of 8192 on 64 Frontier nodes (256 MI250Xs with a total of 512 "compute dies" or "GPUs"). The batch size is 4 per device (2048 globally), so each update consumes 2048 * 8192 = 16.8M tokens in total. Currently, each training update takes around 95 seconds to complete. I calculated that it would take around 65 days to train this model over 1T tokens in this particular configuration (*i.e.* 64 nodes). The implementation currently uses FlashAttention-2, FSDP (full-shard), automatic mixed precision training (with `bf16`), and activation checkpointing. I'm not quite sure yet how suboptimal these results are.
