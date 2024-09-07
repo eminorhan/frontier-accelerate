@@ -1,4 +1,4 @@
-rocm_version=6.1.3
+rocm_version=6.2.0
 
 # Load modules
 module load PrgEnv-gnu/8.5.0

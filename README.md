@@ -35,6 +35,8 @@ pip install transformers datasets accelerate
 I've observed a ~20% improvement in runtime when I use the `aws-ofi-rccl` plugin, which enables `rccl` to use `libfabric`. I provide a shell script here ([`aws_ofi_rccl.sh`](https://github.com/eminorhan/frontier-guide/blob/master/aws_ofi_rccl.sh)) to install this plugin. Simply run this script (*e.g.* `sh aws_ofi_rccl.sh`) to install the plugin (the script assumes that your ROCm version is 6.1.3; if you're using a different version, change it accordingly). I should note, however, that I found this plugin to be quite unstable: it often causes jobs to fail randomly for mysterious reasons.
 
 ### Results
+**Update (Sep 6):** Another ~22% improvement in runtime after I upgraded to PyTorch nightly + ROCm 6.2. I'm not sure what exactly was responsible for the improvement, but good job AMD! After upgrading PyTorch + ROCm, you will have to recompile `aws-ofi-rccl` as well with the new ROCm version (as described above). I updated the script to use ROCm 6.2. Time per update is now ~61 seconds, and estimated total time to train for 1T tokens on 64 Frontier nodes is now down to **~42 days**!
+
 **Update (Sep 5):** A further ~20% improvement in runtime with the `aws-ofi-rccl` plugin (see above). Time per update is now ~77 seconds, and total time estimated to train for 1T tokens on 64 Frontier nodes is now down to **~53 days**. Marchons!
 
 **Update (Sep 5):** Slightly improved throughput by freeing some memory before the backward pass (inspired by the [torchtitan](https://github.com/pytorch/torchtitan) repo). Batch size is now 4 per device, tokens per update is 16.8M, time per update is ~95 seconds, and total time estimated to train for 1T tokens on 64 Frontier nodes is now **~65 days**.

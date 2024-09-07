@@ -4,7 +4,7 @@
 #SBATCH --nodes=64
 #SBATCH --gpus-per-node=8
 #SBATCH --cpus-per-task=8
-#SBATCH --time=00:20:00
+#SBATCH --time=00:30:00
 #SBATCH --job-name=train_llama
 #SBATCH --output=train_llama_%A_%a.out
 #SBATCH --array=0
@@ -17,14 +17,16 @@ export http_proxy=http://proxy.ccs.ornl.gov:3128/
 export https_proxy=http://proxy.ccs.ornl.gov:3128/
 export no_proxy='localhost,127.0.0.0/8,*.ccs.ornl.gov'
 
-# honestly, not sure how many of these below (if any) are absolutely necessary
+# enable aws-ofi-rccl
 export LD_LIBRARY_PATH=/lustre/orion/stf218/scratch/emin/aws-ofi-rccl/lib:$LD_LIBRARY_PATH
-export NCCL_ASYNC_ERROR_HANDLING=1
-export NCCL_BLOCKING_WAIT=1
-export NCCL_IB_TIMEOUT=31
 export NCCL_NET_GDR_LEVEL=3   # Can improve performance, but remove this setting if you encounter a hang/crash.
 export NCCL_ALGO=TREE         # May see performance difference with either setting. (should not need to use this, but can try)
 export NCCL_CROSS_NIC=1       # On large systems, this NCCL setting has been found to improve performance
+
+# honestly, not sure how many of these below (if any) are absolutely necessary
+export NCCL_ASYNC_ERROR_HANDLING=1
+export NCCL_BLOCKING_WAIT=1
+export NCCL_IB_TIMEOUT=31
 
 export HF_HOME="/lustre/orion/stf218/scratch/emin/huggingface"
 export HF_DATASETS_CACHE="/lustre/orion/stf218/scratch/emin/huggingface"

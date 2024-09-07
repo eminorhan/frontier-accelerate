@@ -52,6 +52,8 @@ from transformers.utils.versions import require_version
 from datetime import timedelta
 from accelerate import InitProcessGroupKwargs
 
+# from liger_kernel.transformers import apply_liger_kernel_to_llama
+
 # TODO: this is just a temporary solution to avoid some annoying torch.amp warnings that will be fixed in 2.4.1 hopefully
 warnings.filterwarnings("ignore")
 
@@ -129,6 +131,9 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path, use_fast=True, model_max_length=block_size, token=True)  # TODO: pass this more beautifully
     if args.model_name_or_path.startswith("meta-llama") or args.model_name_or_path.startswith("gpt2") or args.model_name_or_path.startswith("EleutherAI"):
         tokenizer.pad_token = tokenizer.eos_token
+
+    # # 1a. Adding this line automatically monkey-patches the model with the optimized Liger kernels
+    # apply_liger_kernel_to_llama()
 
     if args.model_name_or_path and args.use_pretrained_weights:
         logger.info("Loading pretrained weights")
