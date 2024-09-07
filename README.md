@@ -4,13 +4,12 @@
 
 #### PyTorch-ROCm:
 
-The PyTorch-ROCm installation instructions on the [PyTorch homepage](https://pytorch.org/get-started/locally/) work without any issues:
+The PyTorch-ROCm installation instructions on the [PyTorch homepage](https://pytorch.org/get-started/locally/) work without any issues. Install PyTorch nightly with ROCm 6.2:
 
 ```bash
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.1
+pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/rocm6.2
 ```
 
-AMD provides wheels for a newer version of ROCm (6.2) [here](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/3rd-party/pytorch-install.html), but this requires a nightly build of PyTorch.
 
 #### FlashAttention-2:
 Unlike for CUDA, you will need to install FlashAttention-2 for ROCm separately. [This page](https://rocm.docs.amd.com/en/latest/how-to/llm-fine-tuning-optimization/model-acceleration-libraries.html) provides the instructions for that. Basically, to intall from source:
@@ -20,7 +19,7 @@ git clone https://github.com/ROCm/flash-attention.git
 cd flash-attention/
 GPU_ARCHS=gfx90a python setup.py install  # MI200 series
 ```
-Here, `gfx90a` is the correct GPU architecture choice for MI250X. In the last step, make sure to build with `ninja` (`pip install ninja`), otherwise it might take forever. Also, make sure to set your ROCm home directory correctly for the installation to proceed: *e.g.* `export ROCM_HOME=/opt/rocm-6.1.3` (or `export ROCM_HOME=/opt/rocm-6.2.0` if you have ROCm 6.2).
+Here, `gfx90a` is the correct GPU architecture choice for MI250X. In the last step, make sure to build with `ninja` (`pip install ninja`), otherwise it might take forever. Also, make sure to set your ROCm home directory correctly for the installation to proceed: *e.g.* `export ROCM_HOME=/opt/rocm-6.2.0` (or `export ROCM_HOME=/opt/rocm-6.1.3` if you're using ROCm 6.1).
 
 
 The same page linked above also provides Triton kernels for FlashAttention-2, but I haven't tried them yet.
@@ -32,7 +31,7 @@ pip install transformers datasets accelerate
 ```
 
 #### `aws-ofi-rccl` plugin:
-I've observed a ~20% improvement in runtime when I use the `aws-ofi-rccl` plugin, which enables `rccl` to use `libfabric`. I provide a shell script here ([`aws_ofi_rccl.sh`](https://github.com/eminorhan/frontier-guide/blob/master/aws_ofi_rccl.sh)) to install this plugin. Simply run this script (*e.g.* `sh aws_ofi_rccl.sh`) to install the plugin (the script assumes that your ROCm version is 6.1.3; if you're using a different version, change it accordingly). I should note, however, that I found this plugin to be quite unstable: it often causes jobs to fail randomly for mysterious reasons.
+I've observed a ~20% improvement in runtime when I use the `aws-ofi-rccl` plugin, which enables `rccl` to use `libfabric`. I provide a shell script here ([`aws_ofi_rccl.sh`](https://github.com/eminorhan/frontier-guide/blob/master/aws_ofi_rccl.sh)) to install this plugin. Simply run this script (*e.g.* `sh aws_ofi_rccl.sh`) to install the plugin (the script assumes that your ROCm version is 6.2.0; if you're using a different version, change it accordingly). I should note, however, that I found this plugin to be quite unstable: it often causes jobs to fail randomly for mysterious reasons.
 
 ### Results
 **Update (Sep 6):** Another ~22% improvement in runtime after I upgraded to PyTorch nightly + ROCm 6.2. I'm not sure what exactly was responsible for the improvement, but good job AMD! After upgrading PyTorch + ROCm, you will have to recompile `aws-ofi-rccl` as well with the new ROCm version (as described above). I updated the script to use ROCm 6.2. Time per update is now ~61 seconds, and estimated total time to train for 1T tokens on 64 Frontier nodes is now down to **~42 days**!

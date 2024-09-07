@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #SBATCH --account=stf218
-#SBATCH --nodes=64
+#SBATCH --nodes=4
 #SBATCH --gpus-per-node=8
 #SBATCH --cpus-per-task=8
-#SBATCH --time=00:30:00
+#SBATCH --time=00:20:00
 #SBATCH --job-name=train_llama
 #SBATCH --output=train_llama_%A_%a.out
 #SBATCH --array=0
@@ -24,6 +24,7 @@ export NCCL_ALGO=TREE         # May see performance difference with either setti
 export NCCL_CROSS_NIC=1       # On large systems, this NCCL setting has been found to improve performance
 
 # honestly, not sure how many of these below (if any) are absolutely necessary
+# export PYTORCH_HIP_ALLOC_CONF=expandable_segments:True
 export NCCL_ASYNC_ERROR_HANDLING=1
 export NCCL_BLOCKING_WAIT=1
 export NCCL_IB_TIMEOUT=31

@@ -132,7 +132,7 @@ def main():
     if args.model_name_or_path.startswith("meta-llama") or args.model_name_or_path.startswith("gpt2") or args.model_name_or_path.startswith("EleutherAI"):
         tokenizer.pad_token = tokenizer.eos_token
 
-    # # 1a. Adding this line automatically monkey-patches the model with the optimized Liger kernels
+    # # monkey-patch the model with the optimized Liger kernels
     # apply_liger_kernel_to_llama()
 
     if args.model_name_or_path and args.use_pretrained_weights:
@@ -146,7 +146,7 @@ def main():
     logger.info(f"Tokenizer (vocab) size: {len(tokenizer)}")
     logger.info(f"Pad token id: {tokenizer.pad_token_id}")
 
-    # Turn on gradient checkpointing
+    # turn on gradient checkpointing
     model.gradient_checkpointing_enable()
 
     # Preprocessing the datasets. First we tokenize all the texts.
