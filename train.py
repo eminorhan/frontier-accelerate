@@ -52,8 +52,6 @@ from transformers.utils.versions import require_version
 from datetime import timedelta
 from accelerate import InitProcessGroupKwargs
 
-# from liger_kernel.transformers import apply_liger_kernel_to_llama
-
 # TODO: this is just a temporary solution to avoid some annoying torch.amp warnings that will be fixed in 2.4.1 hopefully
 warnings.filterwarnings("ignore")
 
@@ -132,9 +130,6 @@ def main():
     if args.model_name_or_path.startswith("meta-llama") or args.model_name_or_path.startswith("gpt2") or args.model_name_or_path.startswith("EleutherAI"):
         tokenizer.pad_token = tokenizer.eos_token
 
-    # # monkey-patch the model with the optimized Liger kernels
-    # apply_liger_kernel_to_llama()
-
     if args.model_name_or_path and args.use_pretrained_weights:
         logger.info("Loading pretrained weights")
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, attn_implementation='flash_attention_2', torch_dtype=torch.bfloat16, from_tf=bool(".ckpt" in args.model_name_or_path), config=config, token=True)
@@ -142,7 +137,6 @@ def main():
         logger.info("Training new model from scratch")
         model = AutoModelForCausalLM.from_config(config, attn_implementation='flash_attention_2', torch_dtype=torch.bfloat16)
 
-    model.resize_token_embeddings(new_num_tokens=len(tokenizer), pad_to_multiple_of=128)
     logger.info(f"Tokenizer (vocab) size: {len(tokenizer)}")
     logger.info(f"Pad token id: {tokenizer.pad_token_id}")
 
