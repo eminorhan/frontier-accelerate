@@ -45,6 +45,6 @@ The training files in this repo ([`train.py`](https://github.com/eminorhan/front
 ### TODO:
 
 - [ ] Write a version of the training code without `accelerate` for greater control.
-- [ ] Try the [torchtitan](https://github.com/pytorch/torchtitan) codebase. 
+- [x] Try the [torchtitan](https://github.com/pytorch/torchtitan) codebase ([here](https://github.com/eminorhan/frontier-torchtitan); achieves similar throughput to this repo). 
 - [ ] Try MosaicML's [llm-foundry](https://github.com/mosaicml/llm-foundry) codebase.
 - [ ] Try the [TinyLlama](https://github.com/jzhang38/TinyLlama) codebase.
